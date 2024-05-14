@@ -1,4 +1,4 @@
-// Exercise 1.1
+// Exercise 1.1+1.2
 
 const Header = (props) => {
   return ( 
@@ -6,19 +6,21 @@ const Header = (props) => {
   )
 }
 
+const Part = (props) => {
+  return (
+    <p>
+      {props.parte.name} {props.parte.exercises} 
+    </p>
+  )
+}
+
 const Content = (props) => {
   return (
-    <>
-    {props.course.map((item) => {
-      return (
-          <div key={item.name}>
-          <p> 
-            {item.name} {item.exercises}
-          </p></div>
-        )
-      })
-    }
-    </>
+    <div>
+      <Part parte = {props.course[0]}/>
+      <Part parte = {props.course[1]}/>
+      <Part parte = {props.course[2]}/>
+    </div>
   )
 }      
 const Total = (props) => {
