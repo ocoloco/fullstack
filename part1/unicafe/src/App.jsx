@@ -1,39 +1,39 @@
+// Unicafe
+// Ejercicio 1.6, 1.7, 1.8, 1.9, 1.10, 1.11
+
 import { useState } from 'react'
+ 
+const Title = ({titulo}) =><h1>{titulo}</h1>
 
-const Title = ({titulo,show}) => {
-  if (!show){
-    return <h1>{titulo}</h1>
-  }
-}
+const Button = ({handleClick,text}) =><button onClick={handleClick}>{text}</button>
 
-const Button = ({handleClick,text,show}) => {
-  if (!show)
-    return <button onClick={handleClick}>{text}</button>
-}
+const Stat = ({stat,text}) => <tr><td>{text}</td><td>{stat}</td></tr>
+const StatPercentage = ({stat,text}) =><tr><td>{text}</td><td>{stat*100}%</td></tr>
 
-const Stat = ({stat,text}) => <p>{text} {stat}</p>
-
-const Resumen = ({show,ngood,nneutral,nbad}) =>{
-  console.log(show)
-  if (show){
-    return (
-      <>
-      <Title titulo="Statistics"/>
-      <Stat stat={ngood} text="Good"/>
-      <Stat stat={nneutral} text="Neutral"/>
-      <Stat stat={nbad} text="Bad"/>
-      </>
+const Statistics = ({ngood, nneutral, nbad, nall}) =>{
+  //Check divide by 0
+  const average = nall ? ((ngood-nbad)/nall):0
+  const positive = nall ? (ngood / nall) : 0
+  return (
+      <table>
+        <tbody>
+          <Stat stat={ngood} text="Good"/>
+          <Stat stat={nneutral} text="Neutral"/>
+          <Stat stat={nbad} text="Bad"/>
+          <Stat stat={nall} text="All" />
+          <Stat stat={average} text="Average" />
+          <StatPercentage stat={positive} text="Positive" />
+        </tbody>
+      </table>
     )
-  }
 }
-
 
 //Main
 const App = () => {
   // guarda los clics de cada botón en su propio estado
-  const [good, setGood] = useState(6)
-  const [neutral, setNeutral] = useState(2)
-  const [bad, setBad] = useState(1)
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
   const [votado, setVotado] = useState(0)
 
   const updateVote = (vote) => () =>{
@@ -49,13 +49,16 @@ const App = () => {
     setVotado(votado + 1)
   }
 
-  return (
+  let all = good + neutral + bad;
+
+  return(
     <div>
-      <Title titulo="Give Feedback" show={votado}/>
+      <Title titulo="Give Feedback"/>
       <Button handleClick={updateVote("G")} text="Good" show={votado}/>
       <Button handleClick={updateVote("N")} text="Neutral" show={votado}/>
       <Button handleClick={updateVote("B")} text="Bad" show={votado}/>
-      <Resumen show={votado} ngood={good} nneutral={neutral} nbad={bad} />
+      <Title titulo="Statistics"/>
+      <Statistics ngood={good} nneutral={neutral} nbad={bad} nall={all}/>
     </div>
   )
 }
