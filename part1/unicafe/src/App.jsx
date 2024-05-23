@@ -14,6 +14,7 @@ const Statistics = ({ngood, nneutral, nbad, nall}) =>{
   //Check divide by 0
   const average = nall ? ((ngood-nbad)/nall):0
   const positive = nall ? (ngood / nall) : 0
+  if (nall > 0){
   return (
       <table>
         <tbody>
@@ -26,6 +27,9 @@ const Statistics = ({ngood, nneutral, nbad, nall}) =>{
         </tbody>
       </table>
     )
+  }else{ 
+    return <p>No feedback given</p>
+  }
 }
 
 //Main
@@ -34,7 +38,6 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
-  const [votado, setVotado] = useState(0)
 
   const updateVote = (vote) => () =>{
     if (vote == "G"){
@@ -46,7 +49,6 @@ const App = () => {
     if (vote == "B"){
       setBad(bad + 1)    
     }
-    setVotado(votado + 1)
   }
 
   let all = good + neutral + bad;
@@ -54,9 +56,9 @@ const App = () => {
   return(
     <div>
       <Title titulo="Give Feedback"/>
-      <Button handleClick={updateVote("G")} text="Good" show={votado}/>
-      <Button handleClick={updateVote("N")} text="Neutral" show={votado}/>
-      <Button handleClick={updateVote("B")} text="Bad" show={votado}/>
+      <Button handleClick={updateVote("G")} text="Good"/>
+      <Button handleClick={updateVote("N")} text="Neutral"/>
+      <Button handleClick={updateVote("B")} text="Bad"/>
       <Title titulo="Statistics"/>
       <Statistics ngood={good} nneutral={neutral} nbad={bad} nall={all}/>
     </div>
