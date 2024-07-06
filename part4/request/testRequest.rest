@@ -1,6 +1,9 @@
 GET http://localhost:3003/api/blogs
 
 ###
+GET http://localhost:3003/api/users
+
+###
 POST http://localhost:3003/api/blogs
 content-type: application/json
 
@@ -16,8 +19,8 @@ POST http://localhost:3003/api/users
 content-type: application/json
 
 {
-    "username": "sapo",
-    "password": ""
+    "username": "root",
+    "password": "toor"
 }
 
 ###
@@ -25,17 +28,17 @@ POST http://localhost:3003/api/login
 content-type: application/json
 
 {
-    "username": "sapo",
-    "password": "con"
+    "username": "root",
+    "password": "toor"
 }
 
 ###
 POST http://localhost:3003/api/blogs 
 Content-Type: application/json 
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9zdXMiLCJpZCI6IjVhNDIyYTg1MWI1NGE2NzYyMzRkMTdmOCIsImlhdCI6MTcxOTIyNjcxMn0.i794s0FbH3ujOvLhE3OkDEhTRkouVLUsCCb34vA5nKQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY2ODY4Yjc3YTZmYWQ5NWEwMDU4ZWQ3YyIsImlhdCI6MTcyMDA5NDQ2MiwiZXhwIjoxNzIwNjk5MjYyfQ.SP0cSvo3aw8VvMH4xcSkzLUdHGyZOJvxJYNr7fU0lC8
 
 {
-    "title": "Prueba2",
+    "title": "Blog 3",
     "author": "David",
     "url": "http://someone.url",
     "likes": 123
