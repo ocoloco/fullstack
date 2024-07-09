@@ -27,14 +27,14 @@ const initialUsers = [
     _id: '667befb399c8bb5d3c5ac903',
     username: 'sapo',
     name: 'David',
-    password: 'con',
+    passwordHash: '$2b$10$6OggXqUZtHlMwhZD/M2tDeiTLulP1q6sB8u.5sqQ/BxotEzRCX6yG',
     blogs: '5a422a851b54a676234d17f1'
   },
   {
     _id: '667befb399c8bb5d3c5ac904',
     username: 'root',
     name: 'Admin',
-    password: 'toor',
+    passwordHash: '$2b$10$6OggXqUZtHlMwhZD/M2tDeiTLulP1q6sB8u.5sqQ/BxotEzRCX6yG',
     blogs: '5a422a851b54a676234d17f0'
   }
 ]
@@ -58,8 +58,6 @@ const usersInDb = async () => {
   return users.map(u => u.toJSON())
 }
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNhcG8iLCJpZCI6IjY2N2JlZmIzOTljOGJiNWQzYzVhYzkwMyIsImlhdCI6MTcxOTQwMDA2NCwiZXhwIjoxNzIwMDA0ODY0fQ.iPQeo-eKIO5RmGrzjghDjrcd-xzY64yd_slvLbuCJDs'
-
 module.exports = {
-  initialBlogs, initialUsers, nonExistingId, blogsInDb, usersInDb, token
+  initialBlogs, initialUsers, nonExistingId, blogsInDb, usersInDb
 }

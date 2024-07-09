@@ -49,29 +49,41 @@ blogRouter.delete('/:id', userExtractor, async (request, response) => {
   if (blogToDelete.user.toString() === user._id.toString())
   {
     await Blog.findByIdAndDelete(request.params.id)
-    // Actualizar usuario
 
+    // Actualizar usuario
     const blogsToUpdate = user.blogs.filter(
       (i) => {
         return (i.toString() !== request.params.id)
       }
     )
-    await User.updateOne({ _id: user._id, blogs: blogsToUpdate })
+    await User.updateOne({ _id: user._id }, { blogs: blogsToUpdate })
 
     response.status(204).end()
   }
   response.status(400).end()
 })
 
-blogRouter.put('/:id', async (request, response) => {
-  const { title, author, url, likes } = request.body
+blogRouter.put('/:id', userExtractor, async (request, response) => {
 
-  const updatedBlog = await Blog.findByIdAndUpdate(
-    request.params.id,
-    { title, author, url, likes },
-    { new: true, runValidators: true, context: 'query' }
-  )
-  response.json(updatedBlog)
+  const { userId } = request
+  const user = await User.findById(userId)
+
+  // es null o undefined?
+  if(user){
+    const { title, author, url, likes } = request.body
+
+    //Se puede hacer like a un blog que no sea tuyo? si o que
+    //const blogToUpdate = await Blog.findById(request.params.id)
+    //No se comparan 2 objectsid de mangodb
+    //if (blogToUpdate.user.toString() === user._id.toString())
+    //{
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      request.params.id,
+      { title, author, url, likes },
+      { new: true, runValidators: true, context: 'query' }
+    )
+    response.json(updatedBlog)
+  } else response.status(400).end()
 })
 
 module.exports = blogRouter

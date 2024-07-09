@@ -1,6 +1,7 @@
 const { test, describe,  after, beforeEach } = require('node:test')
 const assert = require('node:assert')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const mongoose = require('mongoose')
 const helper = require('./test_helper')
 const supertest = require('supertest')
@@ -8,15 +9,30 @@ const app = require('../app')
 
 const api = supertest(app)
 
-// Cambiar el Token antes de realizar cualquier prueba,
-// usuario debe estar autentificado
+const testUser = {
+  username:'test',
+  password:'test'
+}
+
+let token
 
 describe('when there is initially some blogs saved', () => {
 
   beforeEach(async () => {
     await Blog.deleteMany({})
+    await User.deleteMany({})
 
     await Blog.insertMany(helper.initialBlogs)
+
+    await api
+      .post('/api/users')
+      .send(testUser)
+
+    const tokenUser = await api
+      .post('/api/login')
+      .send(testUser)
+
+    token = tokenUser.body.token
   })
 
   test('blogs are returned as json', async () => {
@@ -50,7 +66,15 @@ describe('when there is initially some blogs saved', () => {
     test('succeeds with a valid id', async () => {
       const blogAtStart = await helper.blogsInDb()
 
-      const blogToView = blogAtStart[0]
+      const blogToView ={
+        title: blogAtStart[0].title,
+        author: blogAtStart[0].author,
+        url: blogAtStart[0].url,
+        likes: blogAtStart[0].likes,
+        user: blogAtStart[0].user.toString(),
+        id: blogAtStart[0].id
+      }
+
       const resultBlog = await api
         .get(`/api/blogs/${blogToView.id}`)
         .expect(200)
@@ -104,13 +128,13 @@ describe('when there is initially some blogs saved', () => {
         title: 'TDD harms architecture',
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-        likes: 20,
+        likes: 20
       }
 
       await api
         .post('/api/blogs')
         .send(newblog)
-        .set('Authorization', `Bearer ${helper.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -131,7 +155,7 @@ describe('when there is initially some blogs saved', () => {
       await api
         .post('/api/blogs')
         .send(newblog)
-        .set('Authorization', `Bearer ${helper.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -150,7 +174,7 @@ describe('when there is initially some blogs saved', () => {
       await api
         .post('/api/blogs')
         .send(newblog)
-        .set('Authorization', `Bearer ${helper.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -169,7 +193,7 @@ describe('when there is initially some blogs saved', () => {
       await api
         .post('/api/blogs')
         .send(newBlog)
-        .set('Authorization', `Bearer ${helper.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -185,7 +209,7 @@ describe('when there is initially some blogs saved', () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
-        .set('Authorization', `Bearer ${helper.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -193,12 +217,27 @@ describe('when there is initially some blogs saved', () => {
     })
 
     test('a blog can be deleted', async () => {
+      const newblog = {
+        _id: '5a422b891b54a676234d17f2',
+        title: 'TDD harms architecture',
+        author: 'Robert C. Martin',
+        url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
+        likes: 20
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newblog)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
       const blogAtStart = await helper.blogsInDb()
-      const blogToDelete = blogAtStart[1]
+      const blogToDelete = blogAtStart[blogAtStart.length-1]
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
-        .set('Authorization', `Bearer ${helper.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -209,19 +248,34 @@ describe('when there is initially some blogs saved', () => {
 
   describe('Update of a blog', () => {
     test('Update a blog likes to be 1', async () => {
-      const blogAtStart = await helper.blogsInDb()
-      const updateBlog = blogAtStart[0]
+      const newblog = {
+        _id: '5a422b891b54a676234d17f2',
+        title: 'TDD harms architecture',
+        author: 'Robert C. Martin',
+        url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
+        likes: 20
+      }
 
-      updateBlog.likes = 1 //Supongamos que es Admin
+      await api
+        .post('/api/blogs')
+        .send(newblog)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const blogAtStart = await helper.blogsInDb()
+      const updateBlog = blogAtStart[blogAtStart.length-1]
+
+      updateBlog.likes = 1 //Example
 
       await api
         .put(`/api/blogs/${updateBlog.id}`)
         .send(updateBlog)
-        .set('Authorization', `Bearer ${helper.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200)
 
       const blogsAtEnd = await helper.blogsInDb()
-      assert.deepStrictEqual(blogsAtEnd[0].likes, 1)
+      assert.deepStrictEqual(blogsAtEnd[blogAtStart.length-1].likes, 1)
     })
   })
 })

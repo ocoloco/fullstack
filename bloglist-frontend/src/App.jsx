@@ -1,11 +1,11 @@
 // Ejercicio 5.1, 5.2, 5.3, 5.4
-// 5.5, 5.6, 5.7
+// 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 5.11
 
 import { useState, useEffect, useRef } from 'react'
 import Notificacion from './components/Notificacion'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import listBlogs from './components/listBlogs'
+import ListBlogs from './components/ListBlogs'
 import CreateLoginForm from './components/CreateLoginForm'
 import CreateBlogForm from './components/CreateBlogForm'
 import Togglable from './components/Togglable'
@@ -16,14 +16,16 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(CLEAR)
   const [user, setUser] = useState(null)
+  const [update, setUpdate] = useState(true)
 
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
-  }, [])
+    if (update) {
+      blogService.getAll().then(blogs => setBlogs(blogs))
+      setUpdate(false)
+    }
+  }, [update])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
@@ -68,6 +70,7 @@ const App = () => {
     try {
       const createdBlog = await blogService.create(newBlog)
       setBlogs(blogs.concat(createdBlog))
+      setUpdate(true)
       setErrorMessage({ text: 'Blog created success', type: 2 })
       setTimeout(() => {
         setErrorMessage(CLEAR)
@@ -78,6 +81,22 @@ const App = () => {
         setErrorMessage(CLEAR)
       }, 5000)
     }
+  }
+
+  //Mensajito de actualización
+  const updateBlog = async (message) => {
+    setUpdate(true)
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(CLEAR)
+    }, 5000)
+  }
+
+  //Ordenar blogs por likes
+  const ordenaBlogs = (blogs) => {
+    blogs.sort((x, y) => {
+      return y.likes - x.likes
+    })
   }
 
   return (
@@ -96,7 +115,8 @@ const App = () => {
           <Togglable buttonLabel="new Blog" ref={blogFormRef} >
             <CreateBlogForm createBlog={addBlog} />
           </Togglable>
-          {listBlogs(blogs)}
+          {ordenaBlogs(blogs)}
+          {ListBlogs(blogs, updateBlog, user)}
         </div>
       }
     </div>
