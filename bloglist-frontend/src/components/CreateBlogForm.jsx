@@ -1,6 +1,11 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const CreateBlogForm = ({ createBlog }) => {
+
+  CreateBlogForm.propTypes = {
+    createBlog: PropTypes.func.isRequired,
+  }
 
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -17,7 +22,6 @@ const CreateBlogForm = ({ createBlog }) => {
     setAuthor('')
     setUrl('')
   }
-
 
   return (
     <div>

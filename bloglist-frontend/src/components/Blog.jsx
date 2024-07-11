@@ -1,7 +1,24 @@
 import { useState, useRef } from 'react'
 import blogService from '../services/blogs'
+import PropTypes from 'prop-types'
 
-const Blog = ({ blog, mensaje, user }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
+
+  Blog.propTypes =  {
+    blog: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      author: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+      likes: PropTypes.number.isRequired,
+      user: PropTypes.object.isRequired
+    }),
+    updateBlog: PropTypes.func.isRequired,
+    deleteBlog: PropTypes.func.isRequired,
+    user:PropTypes.shape({
+      token: PropTypes.string.isRequired,
+      username:PropTypes.string.isRequired,
+    })
+  }
 
   const [blogVisible, setBlogVisible] = useState(false)
   const [buttonName, setButtonName] = useState('Show')
@@ -31,9 +48,9 @@ const Blog = ({ blog, mensaje, user }) => {
 
       await blogService.update(blog.id, newObject)
       setLikes(likes + 1)
-      mensaje({ text: `Blog "${blog.title}" like+1 thanks`, type: 2 })
+      updateBlog({ text: `Blog "${blog.title}" like+1 thanks`, type: 2 }, blog.id)
     } catch (error) {
-      mensaje({ text: `Can't update "${blog.title}" likes: Server error 400 `, type: 1 })
+      updateBlog({ text: `Can't update "${blog.title}" likes: Server error 400 `, type: 1 })
     }
   }
 
@@ -41,11 +58,10 @@ const Blog = ({ blog, mensaje, user }) => {
     if (window.confirm(`Do you want delete ${blog.title}?`)) {
       try {
         await blogService.remove(blog.id)
-        mensaje({ text: `Blog "${blog.title}" has been deleted`, type: 2 })
+        deleteBlog({ text: `Blog "${blog.title}" has been deleted`, type: 2 }, blog.id)
       }
       catch (error) {
-        console.log(error)
-        mensaje({ text: `Can't delete "${blog.title}": Server error 400`, type: 1 })
+        deleteBlog({ text: `Can't delete "${blog.title}": Server error 400`, type: 1 })
       }
     }
   }

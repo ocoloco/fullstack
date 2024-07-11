@@ -1,9 +1,17 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const CreateLoginForm = ({ login }) => {
 
+  CreateLoginForm.propTypes = {
+    login: PropTypes.func.isRequired,
+  }
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  const handleUsernameChange = ({ target }) => setUsername(target.value)
+  const handlePasswordChange = ({ target }) => setPassword(target.value)
 
   const doLogin = (event) => {
     event.preventDefault()
@@ -21,12 +29,12 @@ const CreateLoginForm = ({ login }) => {
         <div>
           username:
           <input type='text' value={username} name='username' autoComplete='username'
-            onChange={({ target }) => setUsername(target.value)}></input>
+            onChange={handleUsernameChange}></input>
         </div>
         <div>
           password:
           <input type="password" value={password} name="password" autoComplete="current-password"
-            onChange={({ target }) => setPassword(target.value)}></input>
+            onChange={handlePasswordChange}></input>
         </div>
         <button type="submit">login</button>
       </form>
